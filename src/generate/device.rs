@@ -146,6 +146,12 @@ pub fn render(d: &Device, config: &Config, device_x: &mut String) -> Result<Toke
                 std::str::from_utf8(include_bytes!("generic_msp430_atomic.rs"))?;
             writeln!(file, "\n{}", msp430_atomic_file)?;
         }
+        // TODO: Check flags
+        writeln!(
+            file,
+            "\n{}",
+            std::str::from_utf8(include_bytes!("generic_rp2040_atomic.rs"))?
+        )?;
         if config.const_generic {
             let array_proxy = std::str::from_utf8(include_bytes!("array_proxy.rs"))?;
             writeln!(file, "{}", array_proxy)?;
@@ -167,6 +173,15 @@ pub fn render(d: &Device, config: &Config, device_x: &mut String) -> Result<Toke
             let generic_msp430_atomic = syn::parse_file(msp430_atomic_file)?.into_token_stream();
             tokens.extend(generic_msp430_atomic);
         }
+
+        // TODO: Check flags
+        tokens.extend(
+            syn::parse_file(std::str::from_utf8(include_bytes!(
+                "generic_rp2040_atomic.rs"
+            ))?)?
+            .into_token_stream(),
+        );
+
         if config.const_generic {
             let array_proxy = std::str::from_utf8(include_bytes!("array_proxy.rs"))?;
             let generic_array_proxy = syn::parse_file(array_proxy)?.into_token_stream();
